@@ -6,8 +6,6 @@ python:
   - 3.5
   - 3.4
   - 3.3
-  - 2.7
-  - 2.6
 
 # command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 install: pip install -U tox-travis
@@ -20,10 +18,7 @@ script: tox
 deploy:
   provider: pypi
   distributions: sdist bdist_wheel
-  user: rcourivaud
-  password:
-    secure: PLEASE_REPLACE_ME
   on:
     tags: true
     repo: rcourivaud/logstash_logger
-    python: 2.7
+    python: 3.5

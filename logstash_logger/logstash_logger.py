@@ -13,6 +13,16 @@ class LogstashLogger(Logger):
                  port=5000,
                  extra=None,
                  **kwargs):
+        """
+
+        :param logger_name:
+        :param file_name:
+        :param host:
+        :param port:
+        :param extra:
+        :param kwargs:
+        """
+
         super().__init__(name=logger_name)
         if file_name is not None:
             self.addHandler(FileHandler(filename=file_name))
