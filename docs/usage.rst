@@ -6,7 +6,7 @@ To use Logstash Logger in a project::
 
     from logstash_logger import LogstashLogger
 
-You just have to inherit from LogstashLogger Class
+You just have to inherit from LogstashLogger Class::
 
     class MyClass(LogstashLogger):
         def __init__(self):
