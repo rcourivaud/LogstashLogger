@@ -6,7 +6,7 @@ from logging import Logger, DEBUG, INFO, CRITICAL, ERROR, WARNING, raiseExceptio
 from logstash import TCPLogstashHandler
 
 
-class QwantLogger(Logger):
+class LogstashLogger(Logger):
     def __init__(self, logger_name,
                  file_name=None,
                  host="localhost",

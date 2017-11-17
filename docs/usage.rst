@@ -4,4 +4,4 @@ Usage
 
 To use Logstash Logger in a project::
 
-    import logstash_logger
+    from logstash_logger import
