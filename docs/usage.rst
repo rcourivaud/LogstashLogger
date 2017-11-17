@@ -3,8 +3,7 @@ Usage
 =====
 
 This logger must be used with ELK (ElasticSearch, LogStash, Kibana) stack ::
-You can find docker image to build the entire stack This is a paragraph that contains `a link`_.
-.. _a link: https://github.com/rcourivaud/docker-elk
+You can find docker stack image to build the entire stack https://github.com/rcourivaud/docker-elk
 
 To use Logstash Logger in a project::
 

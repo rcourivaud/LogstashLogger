@@ -28,7 +28,7 @@ Logstash Logger handler connect to ELK stack
 Features
 --------
 
-* TODO
+`pip install logstash_logger`
 
 Credits
 ---------
