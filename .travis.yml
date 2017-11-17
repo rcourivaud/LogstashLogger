@@ -20,7 +20,9 @@ deploy:
       ck5uQitEdWdYbnJSV0hQK2xOQWNKQnAvVzl0QlVsK2ZDczdIdG1xTVNOcjNSOWRPb0Z2NHJzaEVv
       NU91MHBEMVZaQWVVY25xOVp1TitFa0lzSy95Q2dJSXh5dkExWExYZmpKa2FIRENNMktjQlJSeFhT
       R3pWREVLV3JXNkpOa3NsMjdEaCtoVDJTeFZVR0UrbVRCU082MzJTTHRHTzNURnFyRHNnUFkrcU09
-install: pip install -U tox-travis
+install:
+    pip install -U tox-travis
+    pip install -U -r requirements_dev.txt
 language: python
 python:
 - 3.5
