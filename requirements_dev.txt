@@ -8,4 +8,5 @@ Sphinx==1.4.8
 cryptography==1.7
 PyYAML==3.11
 tox-travis
+python-logstash
 
