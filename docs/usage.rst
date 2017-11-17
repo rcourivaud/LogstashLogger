@@ -10,4 +10,6 @@ You just have to inherit from LogstashLogger Class::
 
     class MyClass(LogstashLogger):
         def __init__(self):
+            super().__init__()
+            pass
 
