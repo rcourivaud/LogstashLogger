@@ -35,12 +35,13 @@ class LogstashLogger(Logger):
             before = datetime.datetime.now()
             res = f(*args,**kwargs)
             after = datetime.datetime.now()
+            # TODO convert to float
             execution_time = "{0}".format(after-before)
             extra = {
                     "function_name": f.__name__, 
                     "function_res": res, 
                     "execution_time": execution_time,
-                    #"function_class": f.__class__,
+                    "function_class": f.__class__,
                     }
             if args: extra.update({'function_args': args})
             if kwargs: extra.update({'function_kwargs': kwargs})
