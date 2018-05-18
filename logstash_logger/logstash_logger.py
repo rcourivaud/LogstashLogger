@@ -40,104 +40,17 @@ class LogstashLogger(Logger):
                     "function_name": f.__name__, 
                     "function_res": res, 
                     "execution_time": execution_time,
-                    "function_class": f.__class__
+                    #"function_class": f.__class__,
                     }
-            self.info(msg="boo", extra=extra)
+            if args: extra.update({'function_args': args})
+            if kwargs: extra.update({'function_kwargs': kwargs})
+            #self.info(msg="boo", extra=extra)
+            self.log(level=INFO, msg="example_msg", extra_decorate=extra)
 
             return res
         return new_function
 
-    def debug(self, msg, *args, **kwargs):
-        """
-        Log 'msg % args' with severity 'DEBUG'.
-
-        To pass exception information, use the keyword argument exc_info with
-        a true value, e.g.
-
-        logger.debug("Houston, we have a %s", "thorny problem", exc_info=1)
-        """
-        kwargs["extra"] = {**self.extra, **kwargs.get("extra")}
-        if self.isEnabledFor(DEBUG):
-            self._log(DEBUG, msg, args, **kwargs)
-
-    def info(self, msg, extra=None, *args, **kwargs):
-        """
-        Log 'msg % args' with severity 'INFO'.
-
-        To pass exception information, use the keyword argument exc_info with
-        a true value, e.g.
-
-        logger.info("Houston, we have a %s", "interesting problem", exc_info=1)
-        """
-        #if kwargs.get("extra") is not None:
-        #    kwargs["extra"] = {**self.extra, **kwargs["extra"]}
-        #elif self.extra is not None:
-        #    kwargs["extra"] = self.extra
-
-        #if self.isEnabledFor(INFO):
-        #    self._log(INFO, msg, args, **kwargs)
-
-        if kwargs.get("extra") is not None:
-            kwargs["extra"] = {**self.extra, **kwargs["extra"]}
-        elif extra is not None:
-            kwargs["extra"] = extra
-        #elif self.extra is not None:
-        #    kwargs["extra"] = self.extra
-        if self.isEnabledFor(INFO):
-            self._log(INFO, msg, args, **kwargs)
-
-    def warning(self, msg, *args, **kwargs):
-        """
-        Log 'msg % args' with severity 'WARNING'.
-
-        To pass exception information, use the keyword argument exc_info with
-        a true value, e.g.
-
-        logger.warning("Houston, we have a %s", "bit of a problem", exc_info=1)
-        """
-        if kwargs.get("extra") is not None:
-            kwargs["extra"] = {**self.extra, **kwargs["extra"]}
-        elif self.extra is not None:
-            kwargs["extra"] = self.extra
-
-        if self.isEnabledFor(WARNING):
-            self._log(WARNING, msg, args, **kwargs)
-
-    def error(self, msg, *args, **kwargs):
-        """
-        Log 'msg % args' with severity 'ERROR'.
-
-        To pass exception information, use the keyword argument exc_info with
-        a true value, e.g.
-
-        logger.error("Houston, we have a %s", "major problem", exc_info=1)
-        """
-        if kwargs.get("extra") is not None:
-            kwargs["extra"] = {**self.extra, **kwargs["extra"]}
-        elif self.extra is not None:
-            kwargs["extra"] = self.extra
-
-        if self.isEnabledFor(ERROR):
-            self._log(ERROR, msg, args, **kwargs)
-
-    def critical(self, msg, *args, **kwargs):
-        """
-        Log 'msg % args' with severity 'CRITICAL'.
-
-        To pass exception information, use the keyword argument exc_info with
-        a true value, e.g.
-
-        logger.critical("Houston, we have a %s", "major disaster", exc_info=1)
-        """
-        if kwargs.get("extra") is not None:
-            kwargs["extra"] = {**self.extra, **kwargs["extra"]}
-        elif self.extra is not None:
-            kwargs["extra"] = self.extra
-
-        if self.isEnabledFor(CRITICAL):
-            self._log(CRITICAL, msg, args, **kwargs)
-
-    def log(self, level, msg, *args, **kwargs):
+    def log(self, level, msg, extra_decorate=None, *args, **kwargs):
         """
         Log 'msg % args' with the integer severity 'level'.
 
@@ -146,11 +59,13 @@ class LogstashLogger(Logger):
 
         logger.log(level, "We have a %s", "mysterious problem", exc_info=1)
         """
-        if kwargs.get("extra") is not None:
-            kwargs["extra"] = {**self.extra, **kwargs["extra"]}
-        elif self.extra is not None:
-            kwargs["extra"] = self.extra
+        extra_temp = {}
 
+        if self.extra is not None: extra_temp.update(self.extra)
+        if extra_decorate is not None: extra_temp.update(extra_decorate)
+
+        kwargs["extra"] = extra_temp
+        
         if not isinstance(level, int):
             if raiseExceptions:
                 raise TypeError("level must be an integer")
