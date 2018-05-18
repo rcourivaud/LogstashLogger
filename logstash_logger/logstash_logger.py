@@ -28,7 +28,6 @@ class LogstashLogger(Logger):
             self.addHandler(FileHandler(filename=file_name))
         self.addHandler(TCPLogstashHandler(host, port, version=1))
         self.extra = extra
-        print("prout")
 
     def decorate(self, f):
         def new_function(*args,**kwargs):
@@ -45,8 +44,7 @@ class LogstashLogger(Logger):
                     }
             if args: extra.update({'function_args': args})
             if kwargs: extra.update({'function_kwargs': kwargs})
-            #self.info(msg="boo", extra=extra)
-            self.log(level=INFO, msg="example_msg", extra_decorate=extra)
+            self.log(level=DEBUG, msg="example_msg", extra_decorate=extra)
 
             return res
         return new_function
