@@ -29,6 +29,21 @@ class LogstashLogger(Logger):
         self.addHandler(TCPLogstashHandler(host, port, version=1))
         self.extra = extra
 
+    def decorator(self, f):
+        def new_function(*args,**kwargs):
+            import datetime
+            before = datetime.datetime.now()
+            res = f(*args,**kwargs)
+            after = datetime.datetime.now()
+
+            elapsed_time = "{0}".format(after-before)
+            #print("Elapsed Time = {0}".format(after-before))
+            #print(f.__name__)
+            self.extra = {"function_name": f.__name__, "function_res": res, "elapsed_time": elapsed_time}
+            self.info(self.extra)
+            return res
+        return new_function
+
     def debug(self, msg, *args, **kwargs):
         """
         Log 'msg % args' with severity 'DEBUG'.
