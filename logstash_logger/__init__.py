@@ -7,4 +7,4 @@
 #__version__ = '0.1.0'
 
 #from logstash_logger import LogstashLogger
-from logstash_logger import logstash_logger
+from logstash_logger.logstash_logger import LogstashLogger
