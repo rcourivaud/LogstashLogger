@@ -35,8 +35,7 @@ class LogstashLogger(Logger):
             before = datetime.datetime.now()
             res = f(*args,**kwargs)
             after = datetime.datetime.now()
-            # TODO convert to float
-            execution_time = "{0}".format(after-before)
+            execution_time = (after-before).total_seconds()
             extra = {
                     "function_name": f.__name__, 
                     "function_res": res, 
