@@ -1,16 +1,12 @@
 from logstash_logger import LogstashLogger
 
-test = LogstashLogger("hehe")
+test = LogstashLogger("oysta", extra={"radical":"cat", "depressing":"dear"})
 #test.info("boi")
 
-
-
-
-
-@test.decorator
+@test.decorate
 def fallout():
     import time
-    time.sleep(2)
+    time.sleep(3)
     print("boi")
 
 fallout()
