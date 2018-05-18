@@ -29,18 +29,21 @@ class LogstashLogger(Logger):
         self.addHandler(TCPLogstashHandler(host, port, version=1))
         self.extra = extra
 
-    def decorator(self, f):
+    def decorate(self, f):
         def new_function(*args,**kwargs):
             import datetime
             before = datetime.datetime.now()
             res = f(*args,**kwargs)
             after = datetime.datetime.now()
+            execution_time = "{0}".format(after-before)
+            extra = {
+                    "function_name": f.__name__, 
+                    "function_res": res, 
+                    "execution_time": execution_time,
+                    "function_class": f.__class__
+                    }
+            self.info(msg="boo", extra=extra)
 
-            elapsed_time = "{0}".format(after-before)
-            #print("Elapsed Time = {0}".format(after-before))
-            #print(f.__name__)
-            self.extra = {"function_name": f.__name__, "function_res": res, "elapsed_time": elapsed_time}
-            self.info(self.extra)
             return res
         return new_function
 
@@ -57,7 +60,7 @@ class LogstashLogger(Logger):
         if self.isEnabledFor(DEBUG):
             self._log(DEBUG, msg, args, **kwargs)
 
-    def info(self, msg, *args, **kwargs):
+    def info(self, msg, extra=None, *args, **kwargs):
         """
         Log 'msg % args' with severity 'INFO'.
 
@@ -66,11 +69,20 @@ class LogstashLogger(Logger):
 
         logger.info("Houston, we have a %s", "interesting problem", exc_info=1)
         """
+        #if kwargs.get("extra") is not None:
+        #    kwargs["extra"] = {**self.extra, **kwargs["extra"]}
+        #elif self.extra is not None:
+        #    kwargs["extra"] = self.extra
+
+        #if self.isEnabledFor(INFO):
+        #    self._log(INFO, msg, args, **kwargs)
+
         if kwargs.get("extra") is not None:
             kwargs["extra"] = {**self.extra, **kwargs["extra"]}
-        elif self.extra is not None:
-            kwargs["extra"] = self.extra
-
+        elif extra is not None:
+            kwargs["extra"] = extra
+        #elif self.extra is not None:
+        #    kwargs["extra"] = self.extra
         if self.isEnabledFor(INFO):
             self._log(INFO, msg, args, **kwargs)
 
