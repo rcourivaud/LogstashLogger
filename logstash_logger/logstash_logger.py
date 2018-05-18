@@ -28,6 +28,7 @@ class LogstashLogger(Logger):
             self.addHandler(FileHandler(filename=file_name))
         self.addHandler(TCPLogstashHandler(host, port, version=1))
         self.extra = extra
+        print("prout")
 
     def decorate(self, f):
         def new_function(*args,**kwargs):
