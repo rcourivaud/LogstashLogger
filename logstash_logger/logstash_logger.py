@@ -38,12 +38,13 @@ class LogstashLogger(Logger):
             execution_time = (after-before).total_seconds()
             extra = {
                     "function_name": f.__name__, 
-                    "function_res": res, 
+                    #"function_res": res, 
                     "execution_time": execution_time,
                     "function_class": f.__class__,
                     }
             if args: extra.update({'function_args': args})
             if kwargs: extra.update({'function_kwargs': kwargs})
+            if res: extra.update({'function_res': res})
             self.log(level=level, msg="example message", extra_decorate=extra)
 
             return res
