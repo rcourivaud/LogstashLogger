@@ -17,7 +17,7 @@ setup(
     name='logstash_logger',
     version='0.1.0',
     description="Logstash Logger handler connect to ELK stack",
-    long_description=readme + '\n\n' + history,
+    long_description=readme,
     author="Raphaël Courivaud",
     author_email='r.courivaud@gmail.com',
     url='https://github.com/rcourivaud/logstash_logger',
