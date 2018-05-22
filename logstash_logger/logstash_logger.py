@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """Main module."""
-from logging import Logger, DEBUG, INFO, CRITICAL, ERROR, WARNING, raiseExceptions, FileHandler
+from logging import Logger, DEBUG, INFO, CRITICAL, ERROR, WARNING, raiseExceptions, FileHandler, StreamHandler, Formatter
 
 from logstash import TCPLogstashHandler
 
@@ -38,7 +38,6 @@ class LogstashLogger(Logger):
             execution_time = (after-before).total_seconds()
             extra = {
                     "function_name": f.__name__, 
-                    #"function_res": res, 
                     "execution_time": execution_time,
                     "function_class": f.__class__,
                     }
@@ -46,6 +45,14 @@ class LogstashLogger(Logger):
             if kwargs: extra.update({'function_kwargs': kwargs})
             if res: extra.update({'function_res': res})
             self.log(level=level, msg="example message", extra_decorate=extra)
+            
+            ch = StreamHandler()
+            ch.setLevel(DEBUG)
+            formatter = Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+            ch.setFormatter(formatter)
+            self.addHandler(ch)
+            self.info("example message")
+
 
             return res
         return wrapper
@@ -63,7 +70,7 @@ class LogstashLogger(Logger):
 
         if self.extra is not None: extra_temp.update(self.extra)
         if extra_decorate is not None: extra_temp.update(extra_decorate)
-
+    
         kwargs["extra"] = extra_temp
         
         if not isinstance(level, int):
