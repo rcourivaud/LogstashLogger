@@ -5,6 +5,7 @@ from logging import Logger, DEBUG, INFO, CRITICAL, ERROR, WARNING, raiseExceptio
 
 from logstash import TCPLogstashHandler
 
+import socket
 
 class LogstashLogger(Logger):
     def __init__(self, logger_name,
@@ -26,6 +27,8 @@ class LogstashLogger(Logger):
         super().__init__(name=logger_name)
         if file_name is not None:
             self.addHandler(FileHandler(filename=file_name))
+        print(host, port)
+        socket.socket().connect((host, port))
         self.addHandler(TCPLogstashHandler(host, port, version=1))
         self.extra = extra
 
