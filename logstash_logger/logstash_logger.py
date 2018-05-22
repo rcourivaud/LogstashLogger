@@ -46,8 +46,9 @@ class LogstashLogger(Logger):
             if res: extra.update({'function_res': res})
             self.log(level=level, msg="example message", extra_decorate=extra)
             
+            #TODO: refacto by instantiating within __init__
             ch = StreamHandler()
-            ch.setLevel(DEBUG)
+            #ch.setLevel(DEBUG)
             formatter = Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
             ch.setFormatter(formatter)
             self.addHandler(ch)
