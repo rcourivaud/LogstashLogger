@@ -29,7 +29,7 @@ class LogstashLogger(Logger):
         self.addHandler(TCPLogstashHandler(host, port, version=1))
         self.extra = extra
 
-    def decorate(self, f, msg="example message", level=DEBUG):
+    def decorate(self, f, level=DEBUG):
         def wrapper(*args,**kwargs):
             import datetime
             before = datetime.datetime.now()
@@ -44,7 +44,7 @@ class LogstashLogger(Logger):
                     }
             if args: extra.update({'function_args': args})
             if kwargs: extra.update({'function_kwargs': kwargs})
-            self.log(level=level, msg=msg, extra_decorate=extra)
+            self.log(level=level, msg="example message", extra_decorate=extra)
 
             return res
         return wrapper
