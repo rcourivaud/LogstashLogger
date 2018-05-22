@@ -29,7 +29,7 @@ class LogstashLogger(Logger):
         self.addHandler(TCPLogstashHandler(host, port, version=1))
         self.extra = extra
 
-    def decorate(self, f, level=DEBUG):
+    def decorate(self, f):
         def wrapper(*args,**kwargs):
             import datetime
             before = datetime.datetime.now()
@@ -44,7 +44,7 @@ class LogstashLogger(Logger):
             if args: extra.update({'function_args': args})
             if kwargs: extra.update({'function_kwargs': kwargs})
             if res: extra.update({'function_res': res})
-            self.log(level=level, msg="example message", extra_decorate=extra)
+            self.log(level=DEBUG, msg="example message", extra_decorate=extra)
             
             #TODO: refacto by instantiating within __init__
             ch = StreamHandler()
