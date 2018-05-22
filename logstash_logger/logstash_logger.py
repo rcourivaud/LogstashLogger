@@ -30,7 +30,7 @@ class LogstashLogger(Logger):
         self.extra = extra
 
     def decorate(self, f, level=DEBUG):
-        def new_function(*args,**kwargs):
+        def wrapper(*args,**kwargs):
             import datetime
             before = datetime.datetime.now()
             res = f(*args,**kwargs)
@@ -47,7 +47,7 @@ class LogstashLogger(Logger):
             self.log(level=level, msg="example_msg", extra_decorate=extra)
 
             return res
-        return new_function
+        return wrapper
 
     def log(self, level, msg, extra_decorate=None, *args, **kwargs):
         """
