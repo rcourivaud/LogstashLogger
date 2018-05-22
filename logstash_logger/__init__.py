@@ -2,8 +2,8 @@
 
 """Top-level package for Logstash Logger."""
 
-#__author__ = """Raphaël Courivaud"""
-#__email__ = 'r.courivaud@gmail.com'
-#__version__ = '0.1.0'
+__author__ = """Raphaël Courivaud"""
+__email__ = 'r.courivaud@gmail.com'
+__version__ = '0.1.0'
 
-#from logstash_logger import LogstashLogger
+from .logstash_logger import LogstashLogger
