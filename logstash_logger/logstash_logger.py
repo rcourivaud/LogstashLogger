@@ -44,7 +44,8 @@ class LogstashLogger(Logger):
         except (ConnectionRefusedError, socket.gaierror):
             self.log(level=ERROR, msg="Connection to logstash unsuccessful. ({0}:{1})".format(host, port))
 
-    def decorate(self, msg="Example message", level=DEBUG, *args, **kwargs):
+    def decorate(self, msg="Example message", level=DEBUG):
+        if isinstance(level, str): level = level.upper()
         def _(f):
             def wrapper(*args,**kwargs):
                 import datetime
@@ -63,8 +64,8 @@ class LogstashLogger(Logger):
                         **{'function_kwargs': kwargs}, 
                         **{'function_res': res},
                         }
-        
-                self.log(level=_checkLevel(level.upper()), msg=msg.format(**kwargs), extra_decorate=extra)
+
+                self.log(level=_checkLevel(level), msg=msg.format(**kwargs), extra_decorate=extra)
 
                 return res
             return wrapper
