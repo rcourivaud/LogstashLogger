@@ -5,7 +5,11 @@ from logging import Logger, DEBUG, INFO, CRITICAL, ERROR, WARNING, raiseExceptio
 
 from logstash import TCPLogstashHandler
 
+import os
+
 import socket
+import inspect
+
 
 class LogstashLogger(Logger):
     def __init__(self, logger_name,
@@ -24,6 +28,9 @@ class LogstashLogger(Logger):
         """
 
         super().__init__(name=logger_name)
+
+        if extra is None:
+            extra 
         if file_name is not None:
             self.addHandler(FileHandler(filename=file_name))
 
@@ -53,6 +60,13 @@ class LogstashLogger(Logger):
                 res = f(*args,**kwargs)
                 after = datetime.datetime.now()
                 execution_time = (after-before).total_seconds()
+                kwargs = {
+                        **kwargs, 
+                        **{arg_name:arg_value 
+                    for arg_name, arg_value 
+                    in  zip(inspect.getargspec(f).args, args)
+                    }
+                        }
                 extra = {
                         "function_name": f.__name__, 
                         "execution_time": execution_time,
@@ -60,7 +74,6 @@ class LogstashLogger(Logger):
                         }
                 extra = {
                         **extra,  
-                        **{'function_args': args}, 
                         **{'function_kwargs': kwargs}, 
                         **{'function_res': res},
                         }
