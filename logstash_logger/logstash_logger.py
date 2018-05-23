@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """Main module."""
-from logging import Logger, DEBUG, INFO, CRITICAL, ERROR, WARNING, raiseExceptions, FileHandler, StreamHandler, Formatter, basicConfig
+from logging import Logger, DEBUG, INFO, CRITICAL, ERROR, WARNING, raiseExceptions, FileHandler, StreamHandler, Formatter, basicConfig, _checkLevel
 
 from logstash import TCPLogstashHandler
 
@@ -44,25 +44,31 @@ class LogstashLogger(Logger):
         except (ConnectionRefusedError, socket.gaierror):
             self.log(level=ERROR, msg="Connection to logstash unsuccessful. ({0}:{1})".format(host, port))
 
-    def decorate(self, f):
-        def wrapper(*args,**kwargs):
-            import datetime
-            before = datetime.datetime.now()
-            res = f(*args,**kwargs)
-            after = datetime.datetime.now()
-            execution_time = (after-before).total_seconds()
-            extra = {
-                    "function_name": f.__name__, 
-                    "execution_time": execution_time,
-                    "function_class": f.__class__,
-                    }
-            if args: extra.update({'function_args': args})
-            if kwargs: extra.update({'function_kwargs': kwargs})
-            if res: extra.update({'function_res': res})
-            self.log(level=DEBUG, msg="example message", extra_decorate=extra)
+    def decorate(self, msg="Example message", level=DEBUG, *args, **kwargs):
+        def _(f):
+            def wrapper(*args,**kwargs):
+                import datetime
+                before = datetime.datetime.now()
+                res = f(*args,**kwargs)
+                after = datetime.datetime.now()
+                execution_time = (after-before).total_seconds()
+                extra = {
+                        "function_name": f.__name__, 
+                        "execution_time": execution_time,
+                        "function_class": f.__class__,
+                        }
+                extra = {
+                        **extra,  
+                        **{'function_args': args}, 
+                        **{'function_kwargs': kwargs}, 
+                        **{'function_res': res},
+                        }
+        
+                self.log(level=_checkLevel(level.upper()), msg=msg.format(**kwargs), extra_decorate=extra)
 
-            return res
-        return wrapper
+                return res
+            return wrapper
+        return _
 
     def log(self, level, msg, extra_decorate=None, *args, **kwargs):
         """
