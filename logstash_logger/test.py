@@ -4,10 +4,11 @@ test = LogstashLogger("example_logger_name", extra={"example_extra1": "boi", "ex
 #test = LogstashLogger("hunta")
 #test.info("boi")
 
-@test.decorate
+#@test.decorate("ici pour candidate {candidate}", level="info")
+@test.decorate("hey, what up", level="wArNiNg")
 def example_function(*args, **kwargs):
     import time
     time.sleep(1)
-    #return "example_return"
+    return "example_return"
 
-example_function("arg_1", "arg_2", arg_3="bah", arg_4="boh")
+example_function("arg_1", "arg_2", arg_3="bah", arg_4="boh", candidate="123")
