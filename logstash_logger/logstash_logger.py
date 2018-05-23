@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """Main module."""
-from logging import Logger, DEBUG, INFO, CRITICAL, ERROR, WARNING, raiseExceptions, FileHandler, StreamHandler, Formatter
+from logging import Logger, DEBUG, INFO, CRITICAL, ERROR, WARNING, raiseExceptions, FileHandler, StreamHandler, Formatter, basicConfig
 
 from logstash import TCPLogstashHandler
 
@@ -10,12 +10,11 @@ import socket
 class LogstashLogger(Logger):
     def __init__(self, logger_name,
                  file_name=None,
-                 host="logstash",
+                 host="localhost",
                  port=5000,
                  extra=None,
                  **kwargs):
         """
-
         :param logger_name:
         :param file_name:
         :param host:
@@ -27,10 +26,23 @@ class LogstashLogger(Logger):
         super().__init__(name=logger_name)
         if file_name is not None:
             self.addHandler(FileHandler(filename=file_name))
-        print(host, port)
-        socket.socket().connect((host, port))
+
         self.addHandler(TCPLogstashHandler(host, port, version=1))
         self.extra = extra
+
+        #console logging
+        console_handler = StreamHandler()
+        console_handler.setLevel(DEBUG)
+        formatter = Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        console_handler.setFormatter(formatter)
+        self.addHandler(console_handler)
+    
+        #console logging checking for logstash connection success
+        try:
+            socket.socket().connect((host, port))
+            self.info("Connection to logstash successful.")
+        except (ConnectionRefusedError, socket.gaierror):
+            self.log(level=ERROR, msg="Connection to logstash unsuccessful. ({0}:{1})".format(host, port))
 
     def decorate(self, f):
         def wrapper(*args,**kwargs):
@@ -48,15 +60,6 @@ class LogstashLogger(Logger):
             if kwargs: extra.update({'function_kwargs': kwargs})
             if res: extra.update({'function_res': res})
             self.log(level=DEBUG, msg="example message", extra_decorate=extra)
-            
-            #TODO: refacto by instantiating within __init__
-            ch = StreamHandler()
-            #ch.setLevel(DEBUG)
-            formatter = Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-            ch.setFormatter(formatter)
-            self.addHandler(ch)
-            self.info("example message")
-
 
             return res
         return wrapper
