@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """Main module."""
-from logging import Logger, DEBUG, INFO, CRITICAL, ERROR, WARNING, raiseExceptions, FileHandler, StreamHandler, Formatter, basicConfig, _checkLevel
+from logging import Logger, DEBUG, INFO, CRITICAL, ERROR, WARNING, raiseExceptions, FileHandler, StreamHandler, Formatter, _checkLevel
 
 from logstash import TCPLogstashHandler
 
