@@ -10,7 +10,7 @@ import socket
 class LogstashLogger(Logger):
     def __init__(self, logger_name,
                  file_name=None,
-                 host="localhost",
+                 host="logstash",
                  port=5000,
                  extra=None,
                  **kwargs):
