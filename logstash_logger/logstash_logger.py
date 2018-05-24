@@ -1,5 +1,7 @@
 """Main module."""
-from logging import Logger, DEBUG, INFO, CRITICAL, ERROR, WARNING, raiseExceptions, FileHandler, StreamHandler, Formatter, _checkLevel
+import sys
+from logging import Logger, DEBUG, INFO, CRITICAL, ERROR, WARNING, raiseExceptions, FileHandler, StreamHandler, \
+    Formatter, _checkLevel, addLevelName
 
 from logstash import TCPLogstashHandler
 
@@ -7,6 +9,8 @@ import os
 
 import socket
 import inspect
+
+_srcfile = os.path.normcase(addLevelName.__code__.co_filename)
 
 
 class LogstashLogger(Logger):
@@ -51,7 +55,6 @@ class LogstashLogger(Logger):
             self.log(level=ERROR, msg="Connection to logstash unsuccessful. ({0}:{1})".format(host, port))
 
     def decorate(self, msg="Example message", level=DEBUG):
-        #if isinstance(level, str): level = level.upper()
         def _(f):
             def wrapper(*args,**kwargs):
                 import datetime
@@ -69,12 +72,12 @@ class LogstashLogger(Logger):
                         "function_name": f.__name__,
                         "execution_time": execution_time,
                         "function_class": kwargs.get("self").__class__.__name__ if kwargs.get("self") else None,
-                        }
-                extra = {
-                        **extra,
-                        **{'function_kwargs': {k:str(v) for k, v in kwargs.items() if k not in self.blacklist},
+                        **{
+                            'function_kwargs': {k:str(v) for k, v in kwargs.items() if k not in self.blacklist},
                             'function_res': res,
-                            'class': kwargs.get('self')}}
+                            'class': kwargs.get('self')
+                        }
+                }
 
                 self.log(level=level, msg=msg.format(**kwargs), extra_=extra)
 
@@ -92,17 +95,37 @@ class LogstashLogger(Logger):
         logger.log(level, "We have a %s", "mysterious problem", exc_info=1)
         """
 
-        if isinstance(level, str): level = level.upper()
-
-        extra_temp = {}
-
-        if self.extra is not None: extra_temp.update(self.extra)
-        if extra_ is not None: extra_temp.update(extra_)
-
-        kwargs["extra"] = extra_temp
-
         if self.isEnabledFor(_checkLevel(level)):
             self._log(_checkLevel(level), msg, args, **kwargs)
+
+    def _log(self, level, msg, args, exc_info=None, extra=None, extra_=None, stack_info=False):
+        """
+        Low-level logging routine which creates a LogRecord and then calls
+        all the handlers of this logger to handle the record.
+        """
+        level = _checkLevel(level.upper()) if isinstance(level, str) else level
+
+        extra = {**(extra if extra else {}) , **(extra_ if extra_ else {}), **(self.extra if self.extra else {})}
+
+        sinfo = None
+        if _srcfile:
+            # IronPython doesn't track Python frames, so findCaller raises an
+            # exception on some versions of IronPython. We trap it here so that
+            # IronPython can use logging.
+            try:
+                fn, lno, func, sinfo = self.findCaller(stack_info)
+            except ValueError:  # pragma: no cover
+                fn, lno, func = "(unknown file)", 0, "(unknown function)"
+        else:  # pragma: no cover
+            fn, lno, func = "(unknown file)", 0, "(unknown function)"
+        if exc_info:
+            if isinstance(exc_info, BaseException):
+                exc_info = (type(exc_info), exc_info, exc_info.__traceback__)
+            elif not isinstance(exc_info, tuple):
+                exc_info = sys.exc_info()
+        record = self.makeRecord(self.name, level, fn, lno, msg, args,
+                                 exc_info, func, extra, sinfo)
+        self.handle(record)
 
     def update_extra(self, **kwargs):
         self.extra = kwargs if self.extra is None else {**self.extra, **kwargs}
