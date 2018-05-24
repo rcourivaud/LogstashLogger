@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """Main module."""
 from logging import Logger, DEBUG, INFO, CRITICAL, ERROR, WARNING, raiseExceptions, FileHandler, StreamHandler, Formatter, _checkLevel
 
@@ -17,6 +15,7 @@ class LogstashLogger(Logger):
                  host="logstash",
                  port=5000,
                  extra=None,
+                 blacklist=['self'],
                  **kwargs):
         """
         :param logger_name:
@@ -29,13 +28,13 @@ class LogstashLogger(Logger):
 
         super().__init__(name=logger_name)
 
-        if extra is None:
-            extra 
-        if file_name is not None:
-            self.addHandler(FileHandler(filename=file_name))
+        self.extra = extra
+
+        self.blacklist = [] if blacklist is None else blacklist
+
+        if file_name is not None: self.addHandler(FileHandler(filename=file_name))
 
         self.addHandler(TCPLogstashHandler(host, port, version=1))
-        self.extra = extra
 
         #console logging
         console_handler = StreamHandler()
@@ -43,7 +42,7 @@ class LogstashLogger(Logger):
         formatter = Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         console_handler.setFormatter(formatter)
         self.addHandler(console_handler)
-    
+
         #console logging checking for logstash connection success
         try:
             socket.socket().connect((host, port))
@@ -60,23 +59,22 @@ class LogstashLogger(Logger):
                 res = f(*args,**kwargs)
                 after = datetime.datetime.now()
                 execution_time = (after-before).total_seconds()
+
                 kwargs = {
-                        **kwargs, 
-                        **{arg_name:arg_value 
-                    for arg_name, arg_value 
-                    in  zip(inspect.getargspec(f).args, args)
-                    }
+                        **kwargs,
+                        **{arg_name:arg_value for arg_name, arg_value in zip(inspect.getfullargspec(f).args, args)}
                         }
+
                 extra = {
-                        "function_name": f.__name__, 
+                        "function_name": f.__name__,
                         "execution_time": execution_time,
-                        "function_class": f.__class__,
+                        "function_class": kwargs.get("self").__class__.__name__ if kwargs.get("self") else None,
                         }
                 extra = {
-                        **extra,  
-                        **{'function_kwargs': kwargs}, 
-                        **{'function_res': res},
-                        }
+                        **extra,
+                        **{'function_kwargs': {k:str(v) for k, v in kwargs.items() if k not in self.blacklist},
+                            'function_res': res,
+                            'class': kwargs.get('self')}}
 
                 self.log(level=_checkLevel(level), msg=msg.format(**kwargs), extra_decorate=extra)
 
@@ -93,13 +91,14 @@ class LogstashLogger(Logger):
 
         logger.log(level, "We have a %s", "mysterious problem", exc_info=1)
         """
+
         extra_temp = {}
 
         if self.extra is not None: extra_temp.update(self.extra)
         if extra_decorate is not None: extra_temp.update(extra_decorate)
-    
+
         kwargs["extra"] = extra_temp
-        
+
         if not isinstance(level, int):
             if raiseExceptions:
                 raise TypeError("level must be an integer")
