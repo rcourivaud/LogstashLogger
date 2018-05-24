@@ -1,20 +1,27 @@
-# -*- coding: utf-8 -*-
-
 """Main module."""
-from logging import Logger, DEBUG, INFO, CRITICAL, ERROR, WARNING, raiseExceptions, FileHandler
+import sys
+from logging import Logger, DEBUG, INFO, CRITICAL, ERROR, WARNING, raiseExceptions, FileHandler, StreamHandler, \
+    Formatter, _checkLevel, addLevelName
 
 from logstash import TCPLogstashHandler
+
+import os
+
+import socket
+import inspect
+
+_srcfile = os.path.normcase(addLevelName.__code__.co_filename)
 
 
 class LogstashLogger(Logger):
     def __init__(self, logger_name,
                  file_name=None,
-                 host="localhost",
+                 host="logstash",
                  port=5000,
                  extra=None,
+                 blacklist=['self'],
                  **kwargs):
         """
-
         :param logger_name:
         :param file_name:
         :param host:
@@ -24,93 +31,61 @@ class LogstashLogger(Logger):
         """
 
         super().__init__(name=logger_name)
-        if file_name is not None:
-            self.addHandler(FileHandler(filename=file_name))
-        self.addHandler(TCPLogstashHandler(host, port, version=1))
+
         self.extra = extra
 
-    def debug(self, msg, *args, **kwargs):
-        """
-        Log 'msg % args' with severity 'DEBUG'.
+        self.blacklist = [] if blacklist is None else blacklist
 
-        To pass exception information, use the keyword argument exc_info with
-        a true value, e.g.
+        if file_name is not None: self.addHandler(FileHandler(filename=file_name))
 
-        logger.debug("Houston, we have a %s", "thorny problem", exc_info=1)
-        """
-        kwargs["extra"] = {**self.extra, **kwargs.get("extra")}
-        if self.isEnabledFor(DEBUG):
-            self._log(DEBUG, msg, args, **kwargs)
+        self.addHandler(TCPLogstashHandler(host, port, version=1))
 
-    def info(self, msg, *args, **kwargs):
-        """
-        Log 'msg % args' with severity 'INFO'.
+        #console logging
+        console_handler = StreamHandler()
+        console_handler.setLevel(DEBUG)
+        formatter = Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        console_handler.setFormatter(formatter)
+        self.addHandler(console_handler)
 
-        To pass exception information, use the keyword argument exc_info with
-        a true value, e.g.
+        #console logging checking for logstash connection success
+        try:
+            socket.socket().connect((host, port))
+            self.info("Connection to logstash successful.")
+        except (ConnectionRefusedError, socket.gaierror):
+            self.log(level=ERROR, msg="Connection to logstash unsuccessful. ({0}:{1})".format(host, port))
 
-        logger.info("Houston, we have a %s", "interesting problem", exc_info=1)
-        """
-        if kwargs.get("extra") is not None:
-            kwargs["extra"] = {**self.extra, **kwargs["extra"]}
-        elif self.extra is not None:
-            kwargs["extra"] = self.extra
+    def decorate(self, msg="Example message", level=DEBUG):
+        def _(f):
+            def wrapper(*args,**kwargs):
+                import datetime
+                before = datetime.datetime.now()
+                res = f(*args,**kwargs)
+                after = datetime.datetime.now()
+                execution_time = (after-before).total_seconds()
 
-        if self.isEnabledFor(INFO):
-            self._log(INFO, msg, args, **kwargs)
+                kwargs = {
+                        **kwargs,
+                        **{arg_name:arg_value for arg_name, arg_value in zip(inspect.getfullargspec(f).args, args)}
+                        }
 
-    def warning(self, msg, *args, **kwargs):
-        """
-        Log 'msg % args' with severity 'WARNING'.
+                extra = {
+                        "function_name": f.__name__,
+                        "execution_time": execution_time,
+                        "function_class": kwargs.get("self").__class__.__name__ if kwargs.get("self") else None,
+                        **{
+                            'function_kwargs': {k:str(v) for k, v in kwargs.items() if k not in self.blacklist},
+                            'function_res': res,
+                            'class': kwargs.get('self')
+                        }
+                }
 
-        To pass exception information, use the keyword argument exc_info with
-        a true value, e.g.
+                self.log(level=level, msg=msg.format(**kwargs), extra_=extra)
 
-        logger.warning("Houston, we have a %s", "bit of a problem", exc_info=1)
-        """
-        if kwargs.get("extra") is not None:
-            kwargs["extra"] = {**self.extra, **kwargs["extra"]}
-        elif self.extra is not None:
-            kwargs["extra"] = self.extra
+                return res
+            return wrapper
+        return _
 
-        if self.isEnabledFor(WARNING):
-            self._log(WARNING, msg, args, **kwargs)
-
-    def error(self, msg, *args, **kwargs):
-        """
-        Log 'msg % args' with severity 'ERROR'.
-
-        To pass exception information, use the keyword argument exc_info with
-        a true value, e.g.
-
-        logger.error("Houston, we have a %s", "major problem", exc_info=1)
-        """
-        if kwargs.get("extra") is not None:
-            kwargs["extra"] = {**self.extra, **kwargs["extra"]}
-        elif self.extra is not None:
-            kwargs["extra"] = self.extra
-
-        if self.isEnabledFor(ERROR):
-            self._log(ERROR, msg, args, **kwargs)
-
-    def critical(self, msg, *args, **kwargs):
-        """
-        Log 'msg % args' with severity 'CRITICAL'.
-
-        To pass exception information, use the keyword argument exc_info with
-        a true value, e.g.
-
-        logger.critical("Houston, we have a %s", "major disaster", exc_info=1)
-        """
-        if kwargs.get("extra") is not None:
-            kwargs["extra"] = {**self.extra, **kwargs["extra"]}
-        elif self.extra is not None:
-            kwargs["extra"] = self.extra
-
-        if self.isEnabledFor(CRITICAL):
-            self._log(CRITICAL, msg, args, **kwargs)
-
-    def log(self, level, msg, *args, **kwargs):
+    def log(self, level, msg, extra_=None, *args, **kwargs):
         """
         Log 'msg % args' with the integer severity 'level'.
 
@@ -119,15 +94,38 @@ class LogstashLogger(Logger):
 
         logger.log(level, "We have a %s", "mysterious problem", exc_info=1)
         """
-        if kwargs.get("extra") is not None:
-            kwargs["extra"] = {**self.extra, **kwargs["extra"]}
-        elif self.extra is not None:
-            kwargs["extra"] = self.extra
 
-        if not isinstance(level, int):
-            if raiseExceptions:
-                raise TypeError("level must be an integer")
-            else:
-                return
-        if self.isEnabledFor(level):
-            self._log(level, msg, args, **kwargs)
+        if self.isEnabledFor(_checkLevel(level)):
+            self._log(_checkLevel(level), msg, args, **kwargs)
+
+    def _log(self, level, msg, args, exc_info=None, extra=None, extra_=None, stack_info=False):
+        """
+        Low-level logging routine which creates a LogRecord and then calls
+        all the handlers of this logger to handle the record.
+        """
+        level = _checkLevel(level.upper()) if isinstance(level, str) else level
+
+        extra = {**(extra if extra else {}) , **(extra_ if extra_ else {}), **(self.extra if self.extra else {})}
+
+        sinfo = None
+        if _srcfile:
+            # IronPython doesn't track Python frames, so findCaller raises an
+            # exception on some versions of IronPython. We trap it here so that
+            # IronPython can use logging.
+            try:
+                fn, lno, func, sinfo = self.findCaller(stack_info)
+            except ValueError:  # pragma: no cover
+                fn, lno, func = "(unknown file)", 0, "(unknown function)"
+        else:  # pragma: no cover
+            fn, lno, func = "(unknown file)", 0, "(unknown function)"
+        if exc_info:
+            if isinstance(exc_info, BaseException):
+                exc_info = (type(exc_info), exc_info, exc_info.__traceback__)
+            elif not isinstance(exc_info, tuple):
+                exc_info = sys.exc_info()
+        record = self.makeRecord(self.name, level, fn, lno, msg, args,
+                                 exc_info, func, extra, sinfo)
+        self.handle(record)
+
+    def update_extra(self, **kwargs):
+        self.extra = kwargs if self.extra is None else {**self.extra, **kwargs}
