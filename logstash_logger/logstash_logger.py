@@ -51,7 +51,7 @@ class LogstashLogger(Logger):
             self.log(level=ERROR, msg="Connection to logstash unsuccessful. ({0}:{1})".format(host, port))
 
     def decorate(self, msg="Example message", level=DEBUG):
-        if isinstance(level, str): level = level.upper()
+        #if isinstance(level, str): level = level.upper()
         def _(f):
             def wrapper(*args,**kwargs):
                 import datetime
@@ -76,13 +76,13 @@ class LogstashLogger(Logger):
                             'function_res': res,
                             'class': kwargs.get('self')}}
 
-                self.log(level=_checkLevel(level), msg=msg.format(**kwargs), extra_decorate=extra)
+                self.log(level=level, msg=msg.format(**kwargs), extra_=extra)
 
                 return res
             return wrapper
         return _
 
-    def log(self, level, msg, extra_decorate=None, *args, **kwargs):
+    def log(self, level, msg, extra_=None, *args, **kwargs):
         """
         Log 'msg % args' with the integer severity 'level'.
 
@@ -92,17 +92,17 @@ class LogstashLogger(Logger):
         logger.log(level, "We have a %s", "mysterious problem", exc_info=1)
         """
 
+        if isinstance(level, str): level = level.upper()
+
         extra_temp = {}
 
         if self.extra is not None: extra_temp.update(self.extra)
-        if extra_decorate is not None: extra_temp.update(extra_decorate)
+        if extra_ is not None: extra_temp.update(extra_)
 
         kwargs["extra"] = extra_temp
 
-        if not isinstance(level, int):
-            if raiseExceptions:
-                raise TypeError("level must be an integer")
-            else:
-                return
-        if self.isEnabledFor(level):
-            self._log(level, msg, args, **kwargs)
+        if self.isEnabledFor(_checkLevel(level)):
+            self._log(_checkLevel(level), msg, args, **kwargs)
+
+    def update_extra(self, **kwargs):
+        self.extra = kwargs if self.extra is None else {**self.extra, **kwargs}
