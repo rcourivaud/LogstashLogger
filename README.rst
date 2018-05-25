@@ -18,8 +18,7 @@ Logstash Logger
      :alt: Updates
 
 
-Logstash Logger handler connect to ELK stack
-
+Log handler to log better and send logs to Logstash
 
 * Free software: MIT license
 * Documentation: https://logstash-logger.readthedocs.io.
@@ -28,7 +27,9 @@ Logstash Logger handler connect to ELK stack
 Features
 --------
 
-`pip install logstash_logger`
+.. code-block:: bash
+
+    pip install magic_logger
 
 Credits
 ---------
@@ -37,4 +38,36 @@ This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypack
 
 .. _Cookiecutter: https://github.com/audreyr/cookiecutter
 .. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
+
+How to use
+----------
+
+1. Import module
+
+.. code-block:: python
+
+    from magic_logger import MagicLogger
+
+2. Instantiate MagicLogger with a name. Logstash host is changed with kwarg `host`.
+
+.. code-block:: python
+
+    logger = MagicLogger('Name')
+
+3. Decorate a function in order to log it into Logstash and into the console.
+
+.. code-block:: python
+
+    @logger.decorate('This is a message.')
+    def a():
+        return 'This is a return'
+
+Output
+
+.. code-block:: bash
+
+
+
+
+
 
