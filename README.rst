@@ -49,6 +49,7 @@ How to use
     from magic_logger import MagicLogger
 
 2. Instantiate MagicLogger with a name. Logstash host is changed with kwarg `host`.
+   If you have a specific Logstash host, feel free to edit the `magic_logger.py` default host.
 
 .. code-block:: python
 
@@ -62,9 +63,43 @@ How to use
     def a():
         return 'This is a return'
 
-Output
+Terminal output:
 
 .. code-block:: bash
+
+    2018-05-25 11:39:21,663 - Name - INFO - Connection to logstash successful.
+    2018-05-25 11:39:21,669 - Name - DEBUG - This is a message
+
+Logstash output:
+
+.. code-block:: bash
+
+    logstash_1       | {
+    logstash_1       |      "@timestamp" => 2018-05-25T09:39:21.669Z,
+    logstash_1       |         "message" => "This is a message",
+    logstash_1       |            "type" => "logstash",
+    logstash_1       |      "stack_info" => nil,
+    logstash_1       |     "logger_name" => "Name",
+    logstash_1       |            "path" => "/Users/nicolas.vo/kudoz/elk/MagicLogger/magic_logger/magic_logger.py",
+    logstash_1       |            "port" => 55684,
+    logstash_1       |        "@version" => "1",
+    logstash_1       |            "tags" => [],
+    logstash_1       |            "host" => "MBP-C02WC1F4HV2Q.local",
+    logstash_1       |           "level" => "DEBUG"
+    logstash_1       | }
+    logstash_1       | {
+    logstash_1       |      "@timestamp" => 2018-05-25T09:39:21.663Z,
+    logstash_1       |         "message" => "Connection to logstash successful.",
+    logstash_1       |            "type" => "logstash",
+    logstash_1       |      "stack_info" => nil,
+    logstash_1       |     "logger_name" => "Name",
+    logstash_1       |            "path" => "/Users/nicolas.vo/kudoz/elk/MagicLogger/magic_logger/magic_logger.py",
+    logstash_1       |            "port" => 55684,
+    logstash_1       |        "@version" => "1",
+    logstash_1       |            "tags" => [],
+    logstash_1       |            "host" => "MBP-C02WC1F4HV2Q.local",
+    logstash_1       |           "level" => "INFO"
+    logstash_1       | }
 
 
 
