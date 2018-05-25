@@ -53,58 +53,50 @@ How to use
 
 .. code-block:: python
 
-    logger = MagicLogger('Name')
+    logger = MagicLogger('Name', host='localhost')
 
 3. Decorate a function in order to log it into Logstash and into the console
 
 .. code-block:: python
 
     @logger.decorate('This is a message.')
-    def a():
+    def a(*args, **kwargs):
         return 'This is a return'
+    
+    a('arg_1', 'arg_2', kwarg_1='hello', kwarg_2='world') 
 
 Terminal output:
 
 .. code-block:: bash
 
-    2018-05-25 17:04:26,314 - Name - INFO - Connection to logstash successful.
-    2018-05-25 17:04:26,321 - Name - DEBUG - This is a message
+    2018-05-25 23:09:35,514 - Name - INFO - Connection to logstash successful.
+    2018-05-25 23:09:35,518 - Name - DEBUG - This is a message.
 
 Logstash output:
 
 .. code-block:: bash
 
     logstash_1       | {
-    logstash_1       |      "@timestamp" => 2018-05-25T15:04:26.314Z,
-    logstash_1       |         "message" => "Connection to logstash successful.",
-    logstash_1       |            "type" => "logstash",
-    logstash_1       |      "stack_info" => nil,
-    logstash_1       |     "logger_name" => "Name",
-    logstash_1       |            "path" => "/Users/nicolas.vo/kudoz/elk/MagicLogger/magic_logger/magic_logger.py",
-    logstash_1       |            "port" => 33506,
-    logstash_1       |        "@version" => "1",
-    logstash_1       |            "tags" => [],
-    logstash_1       |            "host" => "MBP-C02WC1F4HV2Q.local",
-    logstash_1       |           "level" => "INFO"
-    logstash_1       | }
-    logstash_1       | {
-    logstash_1       |      "execution_time" => 9.0e-06,
-    logstash_1       |      "function_class" => nil,
-    logstash_1       |        "function_res" => "This is a return",
-    logstash_1       |          "@timestamp" => 2018-05-25T15:04:26.321Z,
-    logstash_1       |             "message" => "This is a message",
-    logstash_1       |                "type" => "logstash",
     logstash_1       |          "stack_info" => nil,
-    logstash_1       |         "logger_name" => "Name",
-    logstash_1       |       "function_name" => "a",
-    logstash_1       |                "path" => "/Users/nicolas.vo/kudoz/elk/MagicLogger/magic_logger/magic_logger.py",
-    logstash_1       |                "port" => 33506,
     logstash_1       |            "@version" => "1",
-    logstash_1       |                "tags" => [],
+    logstash_1       |                "type" => "logstash",
+    logstash_1       |             "message" => "This is a message.",
+    logstash_1       |     "function_kwargs" => {
+    logstash_1       |         "kwarg_2" => "world",
+    logstash_1       |         "kwarg_1" => "hello"
+    logstash_1       |     },
+    logstash_1       |                "host" => "Nicolass-MacBook-Pro.local",
+    logstash_1       |       "function_name" => "a",
+    logstash_1       |                "path" => "/Users/nico/corners/MagicLogger/magic_logger/magic_logger.py",
     logstash_1       |               "class" => nil,
-    logstash_1       |                "host" => "MBP-C02WC1F4HV2Q.local",
-    logstash_1       |     "function_kwargs" => {},
-    logstash_1       |               "level" => "DEBUG"
+    logstash_1       |                "port" => 51772,
+    logstash_1       |               "level" => "DEBUG",
+    logstash_1       |                "tags" => [],
+    logstash_1       |        "function_res" => "This is a return",
+    logstash_1       |          "@timestamp" => 2018-05-25T21:09:35.518Z,
+    logstash_1       |      "execution_time" => 5.0e-06,
+    logstash_1       |         "logger_name" => "Name",
+    logstash_1       |      "function_class" => nil
     logstash_1       | }
 
 5. Add an extra to the decorator within the decorated function with the `update_extra` method
@@ -115,6 +107,8 @@ Logstash output:
     def a():
         logger.update_extra(post_extra='This is a new extra')
         return 'This is a return'
+
+    a()
 
 6. Write a regular log
 
