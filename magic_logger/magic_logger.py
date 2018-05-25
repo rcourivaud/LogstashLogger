@@ -13,7 +13,7 @@ import inspect
 _srcfile = os.path.normcase(addLevelName.__code__.co_filename)
 
 
-class LogstashLogger(Logger):
+class MagicLogger(Logger):
     def __init__(self, logger_name,
                  file_name=None,
                  host="logstash",
