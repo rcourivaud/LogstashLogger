@@ -99,7 +99,7 @@ Logstash output:
     logstash_1       |      "function_class" => nil
     logstash_1       | }
 
-5. Add an extra to the decorator within the decorated function with the `update_extra` method
+4. Add an extra to the decorator within the decorated function with the `update_extra` method
 
 .. code-block:: python
 
@@ -110,7 +110,7 @@ Logstash output:
 
     a()
 
-6. Write a regular log
+5. Write a regular log
 
 .. code-block:: python
 
