@@ -3,7 +3,7 @@ deploy:
   provider: pypi
   distributions: sdist bdist_wheel
   true:
-    python: 3.5
+    python: 3.6
     repo: rcourivaud/logstash_logger
     tags: true
   password:
@@ -23,5 +23,5 @@ deploy:
 install: pip install tox-travis
 language: python
 python:
-- 3.5
+- 3.6
 script: tox
