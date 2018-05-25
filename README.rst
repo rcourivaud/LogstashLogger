@@ -55,7 +55,7 @@ How to use
 
     logger = MagicLogger('Name')
 
-3. Decorate a function in order to log it into Logstash and into the console.
+3. Decorate a function in order to log it into Logstash and into the console
 
 .. code-block:: python
 
@@ -74,32 +74,6 @@ Logstash output:
 
 .. code-block:: bash
 
-    logstash_1       | {
-    logstash_1       |      "@timestamp" => 2018-05-25T09:39:21.669Z,
-    logstash_1       |         "message" => "This is a message",
-    logstash_1       |            "type" => "logstash",
-    logstash_1       |      "stack_info" => nil,
-    logstash_1       |     "logger_name" => "Name",
-    logstash_1       |            "path" => "/Users/nicolas.vo/kudoz/elk/MagicLogger/magic_logger/magic_logger.py",
-    logstash_1       |            "port" => 55684,
-    logstash_1       |        "@version" => "1",
-    logstash_1       |            "tags" => [],
-    logstash_1       |            "host" => "MBP-C02WC1F4HV2Q.local",
-    logstash_1       |           "level" => "DEBUG"
-    logstash_1       | }
-    logstash_1       | {
-    logstash_1       |      "@timestamp" => 2018-05-25T09:39:21.663Z,
-    logstash_1       |         "message" => "Connection to logstash successful.",
-    logstash_1       |            "type" => "logstash",
-    logstash_1       |      "stack_info" => nil,
-    logstash_1       |     "logger_name" => "Name",
-    logstash_1       |            "path" => "/Users/nicolas.vo/kudoz/elk/MagicLogger/magic_logger/magic_logger.py",
-    logstash_1       |            "port" => 55684,
-    logstash_1       |        "@version" => "1",
-    logstash_1       |            "tags" => [],
-    logstash_1       |            "host" => "MBP-C02WC1F4HV2Q.local",
-    logstash_1       |           "level" => "INFO"
-    logstash_1       | }
 
 
 
