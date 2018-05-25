@@ -67,16 +67,79 @@ Terminal output:
 
 .. code-block:: bash
 
-    2018-05-25 11:39:21,663 - Name - INFO - Connection to logstash successful.
-    2018-05-25 11:39:21,669 - Name - DEBUG - This is a message
+    2018-05-25 17:04:26,314 - Name - INFO - Connection to logstash successful.
+    2018-05-25 17:04:26,321 - Name - DEBUG - This is a message
 
 Logstash output:
 
 .. code-block:: bash
 
+    logstash_1       | {
+    logstash_1       |      "@timestamp" => 2018-05-25T15:04:26.314Z,
+    logstash_1       |         "message" => "Connection to logstash successful.",
+    logstash_1       |            "type" => "logstash",
+    logstash_1       |      "stack_info" => nil,
+    logstash_1       |     "logger_name" => "Name",
+    logstash_1       |            "path" => "/Users/nicolas.vo/kudoz/elk/MagicLogger/magic_logger/magic_logger.py",
+    logstash_1       |            "port" => 33506,
+    logstash_1       |        "@version" => "1",
+    logstash_1       |            "tags" => [],
+    logstash_1       |            "host" => "MBP-C02WC1F4HV2Q.local",
+    logstash_1       |           "level" => "INFO"
+    logstash_1       | }
+    logstash_1       | {
+    logstash_1       |      "execution_time" => 9.0e-06,
+    logstash_1       |      "function_class" => nil,
+    logstash_1       |        "function_res" => "This is a return",
+    logstash_1       |          "@timestamp" => 2018-05-25T15:04:26.321Z,
+    logstash_1       |             "message" => "This is a message",
+    logstash_1       |                "type" => "logstash",
+    logstash_1       |          "stack_info" => nil,
+    logstash_1       |         "logger_name" => "Name",
+    logstash_1       |       "function_name" => "a",
+    logstash_1       |                "path" => "/Users/nicolas.vo/kudoz/elk/MagicLogger/magic_logger/magic_logger.py",
+    logstash_1       |                "port" => 33506,
+    logstash_1       |            "@version" => "1",
+    logstash_1       |                "tags" => [],
+    logstash_1       |               "class" => nil,
+    logstash_1       |                "host" => "MBP-C02WC1F4HV2Q.local",
+    logstash_1       |     "function_kwargs" => {},
+    logstash_1       |               "level" => "DEBUG"
+    logstash_1       | }
 
+4. Write a regular log
 
+    .. code-block:: bash
 
+    test_list = [1, 2, 3]
+    test_string = "This is a string"
+    logger.info('This is a message', extra = {"a_list": test_list, "a_string": test_string})
 
+Logstash output:
 
+    .. code-block:: bash
+
+    2018-05-25 17:08:15,654 - Name - INFO - This is a message
+
+    .. code-block:: bash
+
+    logstash_1       | {
+    logstash_1       |      "@timestamp" => 2018-05-25T15:08:15.654Z,
+    logstash_1       |         "message" => "This is a message",
+    logstash_1       |            "type" => "logstash",
+    logstash_1       |      "stack_info" => nil,
+    logstash_1       |     "logger_name" => "Name",
+    logstash_1       |            "path" => "test.py",
+    logstash_1       |            "port" => 33542,
+    logstash_1       |        "@version" => "1",
+    logstash_1       |          "a_list" => [
+    logstash_1       |         [0] 1,
+    logstash_1       |         [1] 2,
+    logstash_1       |         [2] 3
+    logstash_1       |     ],
+    logstash_1       |        "a_string" => "This is a string",
+    logstash_1       |            "tags" => [],
+    logstash_1       |            "host" => "MBP-C02WC1F4HV2Q.local",
+    logstash_1       |           "level" => "INFO"
+    logstash_1       | }
 
