@@ -107,7 +107,16 @@ Logstash output:
     logstash_1       |               "level" => "DEBUG"
     logstash_1       | }
 
-4. Write a regular log
+5. Add an extra to the decorator within the decorated function with the `update_extra` method
+
+.. code-block:: python
+
+    @logger.decorate('This is a message')
+    def a():
+        logger.update_extra(post_extra='This is a new extra')
+        return 'This is a return'
+
+6. Write a regular log
 
 .. code-block:: python
 
