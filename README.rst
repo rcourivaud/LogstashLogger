@@ -109,17 +109,19 @@ Logstash output:
 
 4. Write a regular log
 
-    .. code-block:: bash
+    .. code-block:: python
 
     test_list = [1, 2, 3]
     test_string = "This is a string"
     logger.info('This is a message', extra = {"a_list": test_list, "a_string": test_string})
 
-Logstash output:
+Terminal output:
 
     .. code-block:: bash
 
     2018-05-25 17:08:15,654 - Name - INFO - This is a message
+
+Logstash output:
 
     .. code-block:: bash
 
