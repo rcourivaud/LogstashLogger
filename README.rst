@@ -109,7 +109,7 @@ Logstash output:
 
 4. Write a regular log
 
-    .. code-block:: python
+.. code-block:: python
 
     test_list = [1, 2, 3]
     test_string = "This is a string"
@@ -117,13 +117,13 @@ Logstash output:
 
 Terminal output:
 
-    .. code-block:: bash
+.. code-block:: bash
 
     2018-05-25 17:08:15,654 - Name - INFO - This is a message
 
 Logstash output:
 
-    .. code-block:: bash
+.. code-block:: bash
 
     logstash_1       | {
     logstash_1       |      "@timestamp" => 2018-05-25T15:08:15.654Z,
