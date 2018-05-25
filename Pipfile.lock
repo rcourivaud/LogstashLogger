@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "4e55147db217bb4120f6e68cb8cad7bc37011457441ce0eb9d97308315625834"
+            "sha256": "8e94c638129a3c6cd63539510e276d66f290ef77bb4cbeba99827d8245c872c6"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -15,6 +15,14 @@
             }
         ]
     },
-    "default": {},
+    "default": {
+        "python-logstash": {
+            "hashes": [
+                "sha256:10943e5df83f592b4d61b63ad1afff855ccc8c9467f78718f0a59809ba1fe68c"
+            ],
+            "index": "pypi",
+            "version": "==0.4.6"
+        }
+    },
     "develop": {}
 }

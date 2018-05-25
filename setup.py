@@ -12,21 +12,20 @@ requirements = [
     "python-logstash"
 ]
 
-
 setup(
-    name='logstash_logger',
+    name='magic_logger',
     version='0.1.0',
-    description="Logstash Logger handler connect to ELK stack",
+    description="MagicLogger handle Logstash, Stream and File logging",
     long_description=readme,
     author="Raphaël Courivaud",
     author_email='r.courivaud@gmail.com',
-    url='https://github.com/rcourivaud/logstash_logger',
-    packages=find_packages(include=['logstash_logger']),
+    url='https://github.com/rcourivaud/MagicLogger',
+    packages=find_packages(include=['magic_logger']),
     include_package_data=True,
     install_requires=requirements,
     license="MIT license",
     zip_safe=False,
-    keywords='logstash_logger',
+    keywords='magic_logger',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',

@@ -27,4 +27,4 @@ You can define extra parameters which will be passed over all logging functions 
         def __init__(self):
             super().__init__(logger_name,
                  extra={"class":self.__class__})
-            self.info("Initializing method ", extra={"comment":")
+            self.info("Initializing method ", extra={"comment":"my commnent is usefull")

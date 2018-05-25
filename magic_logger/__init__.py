@@ -6,4 +6,4 @@ __author__ = """Raphaël Courivaud"""
 __email__ = 'r.courivaud@gmail.com'
 __version__ = '0.1.0'
 
-from .logstash_logger import LogstashLogger
+from .magic_logger import LogstashLogger

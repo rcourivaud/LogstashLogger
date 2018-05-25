@@ -14,7 +14,7 @@ To install Logstash Logger, run this command in your terminal:
 
     $ pip install logstash_logger
 
-This is the preferred method to install Logstash Logger, as it will always install the most recent stable release. 
+This is the preferred method to install Logstash Logger, as it will always install the most recent stable release.
 
 If you don't have `pip`_ installed, this `Python installation guide`_ can guide
 you through the process.
@@ -33,14 +33,6 @@ You can either clone the public repository:
 .. code-block:: console
 
     $ git clone git://github.com/rcourivaud/logstash_logger
-
-Or download the `tarball`_:
-
-.. code-block:: console
-
-    $ curl  -OL https://github.com/rcourivaud/logstash_logger/tarball/master
-
-Once you have a copy of the source, you can install it with:
 
 .. code-block:: console
 
