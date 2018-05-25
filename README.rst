@@ -1,5 +1,5 @@
 ===============
-Logstash Logger
+MagicLogger
 ===============
 
 
