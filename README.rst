@@ -44,7 +44,7 @@ Requirements
 
 Enable your Logstash pipeline to listen to incoming JSON streams on port 5000
 
-.. code-block:: json
+.. code-block:: conf
 
     input {
         tcp {
