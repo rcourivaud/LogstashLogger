@@ -39,6 +39,28 @@ This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypack
 .. _Cookiecutter: https://github.com/audreyr/cookiecutter
 .. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
 
+Requirements
+------------
+
+Enable your Logstash pipeline to listen to incoming JSON streams on port 5000
+
+.. code-block:: json
+
+    input {
+        tcp {
+            port => 5000
+            codec => json
+        }
+    }
+    output {
+        elasticsearch {
+            hosts => ["elasticsearch:9200"]
+            index => "logstash_index"
+            document_type => "logtype"
+        }
+    stdout { codec => rubydebug }
+    }
+
 How to use
 ----------
 
