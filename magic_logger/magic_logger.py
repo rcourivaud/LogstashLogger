@@ -71,7 +71,7 @@ class MagicLogger(Logger):
                         'function_name': f.__name__,
                         'execution_time': execution_time,
                         'function_class': kwargs.get("self").__class__.__name__ if kwargs.get("self") else None,
-                        'function_kwargs': {k:str(v) for k, v in kwargs.items() if k not in self.blacklist},
+                        'function_kwargs': {k:str(v) if not isinstance(v, list) else [str(elt) for elt in v] for k, v in kwargs.items() if k not in self.blacklist},
                         'function_res': res,
                         'class': kwargs.get('self')
                 }
