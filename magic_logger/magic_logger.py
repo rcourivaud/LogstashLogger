@@ -67,13 +67,19 @@ class MagicLogger(Logger):
                         **kwargs,
                         **{arg_name:arg_value for arg_name, arg_value in zip(inspect.getfullargspec(f).args, args)}
                 }
+
+                if isinstance(res, list): function_res = [str(res_elt) for res_elt in res]
+                elif isinstance(res, dict): function_res = {k:str(v) for k, v in res.items()}
+                else: function_res = str(res)
+
                 extra_decorate = {
                         'function_name': f.__name__,
                         'execution_time': execution_time,
                         'function_class': kwargs.get("self").__class__.__name__ if kwargs.get("self") else None,
-                        'function_kwargs': {k:str(v) if not isinstance(v, list) else [str(elt) for elt in v] for k, v in kwargs.items() if k not in self.blacklist},
-                        'function_res': res,
-                        'class': kwargs.get('self')
+                        'function_kwargs': {k:str(v) if not isinstance(v, list) else str(v) for k, v in kwargs.items() if k not in self.blacklist},
+			#'function_res': [str(res_elt) for res_elt in res] if isinstance(res, list) elif isinstance(res, dict) {k:str(v) for k, v in res.items()} else str(res),
+			'function_res': function_res,
+                       'class': kwargs.get('self')
                 }
 
                 self.log(level=level, msg=msg.format(**kwargs), extra_decorate=extra_decorate)
@@ -85,10 +91,8 @@ class MagicLogger(Logger):
     def log(self, level, msg, extra_decorate=None, *args, **kwargs):
         """
         Log 'msg % args' with the integer severity 'level'.
-
         To pass exception information, use the keyword argument exc_info with
         a true value, e.g.
-
         logger.log(level, "We have a %s", "mysterious problem", exc_info=1)
         """
 
