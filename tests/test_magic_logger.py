@@ -7,7 +7,8 @@ from magic_logger import MagicLogger
 import os
 
 def test_file_created():
-    TestMagicLogger = MagicLogger(logger_name='test_name', file_name='test_output.txt', host=None)
+    logger_name = 'test_name'
+    TestMagicLogger = MagicLogger(logger_name=logger_name, file_name='test_output.txt', host=None)
     assert isinstance(TestMagicLogger, MagicLogger)
     test_message = 'test_message'
     TestMagicLogger.info(test_message)
@@ -69,4 +70,15 @@ def test_log_error():
         assert log_split[1] == logger_name
 
     os.remove('test_output.txt')
+
+def test_decorator():
+    logger_name = 'test_name'
+    TestMagicLogger = MagicLogger(logger_name=logger_name, file_name='test_output.txt', host=None)
+    @TestMagicLogger.decorate()
+    def test_function(x):
+        return x
+    test_function(x=666)
+
+    os.remove('test_output.txt')
+
 
