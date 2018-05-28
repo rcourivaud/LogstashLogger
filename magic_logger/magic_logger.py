@@ -12,15 +12,15 @@ import inspect
 
 _srcfile = os.path.normcase(addLevelName.__code__.co_filename)
 
-
 class MagicLogger(Logger):
     def __init__(self, logger_name,
-                 file_name=None,
-                 host="logstash",
-                 port=5000,
-                 extra=None,
-                 blacklist=['self'],
-                 **kwargs):
+                     file_name=None,
+                     host="logstash",
+                     port=5000,
+                     extra=None,
+                     blacklist=['self'],
+                     **kwargs):
+
         """
         :param logger_name:
         :param file_name:
@@ -36,7 +36,12 @@ class MagicLogger(Logger):
 
         self.blacklist = [] if blacklist is None else blacklist
 
-        if file_name is not None: self.addHandler(FileHandler(filename=file_name))
+        if file_name is not None:
+            file_handler = FileHandler(filename=file_name)
+            file_handler.setLevel(DEBUG)
+            formatter = Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+            file_handler.setFormatter(formatter)
+            self.addHandler(file_handler)
 
         self.addHandler(TCPLogstashHandler(host, port, version=1))
 
@@ -48,11 +53,12 @@ class MagicLogger(Logger):
         self.addHandler(console_handler)
 
         #console logging checking for logstash connection success
-        try:
-            socket.socket().connect((host, port))
-            self.info("Connection to logstash successful.")
-        except (ConnectionRefusedError, socket.gaierror):
-            self.log(level=ERROR, msg="Connection to logstash unsuccessful. ({0}:{1})".format(host, port))
+        if host is not None:
+            try:
+                socket.socket().connect((host, port))
+                self.info("Connection to logstash successful.")
+            except (ConnectionRefusedError, socket.gaierror):
+                self.log(level=ERROR, msg="Connection to logstash unsuccessful. ({0}:{1})".format(host, port))
 
     def decorate(self, msg="Example message", level=DEBUG):
         def _(f):
