@@ -71,7 +71,7 @@ How to use
     from magic_logger import MagicLogger
 
 2. Instantiate MagicLogger with a name. Logstash host is changed with `host` parameter.
-   If you have a specific and recurrent Logstash host, feel free to edit the `magic_logger.py` default host.
+   Define your own host in a constant file.
 
 .. code-block:: python
 
