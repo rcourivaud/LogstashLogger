@@ -14,13 +14,59 @@ def test_file_created():
     assert os.path.exists('test_output.txt') == True
     os.remove('test_output.txt')
 
+def test_log_debug():
+    logger_name = 'test_name'
+    TestMagicLogger = MagicLogger(logger_name=logger_name, file_name='test_output.txt', host=None)
+    test_message = 'test_message'
+    TestMagicLogger.debug(test_message)
+
+    with open('test_output.txt', 'r') as f:
+        log_split = f.read().split(' - ')
+        assert log_split[3].rstrip() == test_message
+        assert log_split[2] == 'DEBUG'
+        assert log_split[1] == logger_name
+
+    os.remove('test_output.txt')
+
 def test_log_info():
-    TestMagicLogger = MagicLogger(logger_name='test_name', file_name='test_output.txt', host=None)
+    logger_name = 'test_name'
+    TestMagicLogger = MagicLogger(logger_name=logger_name, file_name='test_output.txt', host=None)
     test_message = 'test_message'
     TestMagicLogger.info(test_message)
 
     with open('test_output.txt', 'r') as f:
-        # assert f.read().split(' - ')[3].rstrip() == test_message
-        assert f.read().split(' - ')[2] == 'INFO'
+        log_split = f.read().split(' - ')
+        assert log_split[3].rstrip() == test_message
+        assert log_split[2] == 'INFO'
+        assert log_split[1] == logger_name
 
     os.remove('test_output.txt')
+
+def test_log_warning():
+    logger_name = 'test_name'
+    TestMagicLogger = MagicLogger(logger_name=logger_name, file_name='test_output.txt', host=None)
+    test_message = 'test_message'
+    TestMagicLogger.warning(test_message)
+
+    with open('test_output.txt', 'r') as f:
+        log_split = f.read().split(' - ')
+        assert log_split[3].rstrip() == test_message
+        assert log_split[2] == 'WARNING'
+        assert log_split[1] == logger_name
+
+    os.remove('test_output.txt')
+
+def test_log_error():
+    logger_name = 'test_name'
+    TestMagicLogger = MagicLogger(logger_name=logger_name, file_name='test_output.txt', host=None)
+    test_message = 'test_message'
+    TestMagicLogger.error(test_message)
+
+    with open('test_output.txt', 'r') as f:
+        log_split = f.read().split(' - ')
+        assert log_split[3].rstrip() == test_message
+        assert log_split[2] == 'ERROR'
+        assert log_split[1] == logger_name
+
+    os.remove('test_output.txt')
+
