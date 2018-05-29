@@ -1,0 +1,8 @@
+[
+  "tests/test_magic_logger.py::test_file_created",
+  "tests/test_magic_logger.py::test_log_debug",
+  "tests/test_magic_logger.py::test_log_info",
+  "tests/test_magic_logger.py::test_log_warning",
+  "tests/test_magic_logger.py::test_log_error",
+  "tests/test_magic_logger.py::test_decorator"
+]
