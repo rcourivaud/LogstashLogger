@@ -71,14 +71,31 @@ def test_log_error():
 
     os.remove('test_output.txt')
 
-def test_decorator():
+def test_logger_extra():
     logger_name = 'test_name'
-    TestMagicLogger = MagicLogger(logger_name=logger_name, file_name='test_output.txt', host=None)
-    @TestMagicLogger.decorate()
-    def test_function(x):
-        return x
-    test_function(x=666)
+    TestMagicLogger = MagicLogger(logger_name=logger_name, file_name='test_output.txt', host=None, extra={"test": "test"})
+    assert TestMagicLogger.extra.get("test")
+    assert TestMagicLogger.extra["test"] == "test"
 
-    os.remove('test_output.txt')
+def test_log_extra():
+    logger_name = 'test_name'
+    TestMagicLogger = MagicLogger(logger_name=logger_name, file_name='test_output.txt', host=None,
+                                  extra={"test": "test"})
+    l = TestMagicLogger.error("random_message", extra = {"test": "test"})
+    assert l.__dict__.get("test")
+    assert l.__dict__["test"] == "test"
 
 
+def test_decorate_extra():
+
+    # @TestMagicLogger.decorate()
+    # def test_function(x):
+    #     import time
+    #     time.sleep(2)
+    #     return x
+    # test_function(x=666)
+    # print(TestMagicLogger)
+
+
+
+    # os.remove('test_output.txt')
