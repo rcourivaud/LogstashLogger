@@ -84,18 +84,3 @@ def test_log_extra():
     l = TestMagicLogger.error("random_message", extra = {"test": "test"})
     assert l.__dict__.get("test")
     assert l.__dict__["test"] == "test"
-
-
-def test_decorate_extra():
-
-    # @TestMagicLogger.decorate()
-    # def test_function(x):
-    #     import time
-    #     time.sleep(2)
-    #     return x
-    # test_function(x=666)
-    # print(TestMagicLogger)
-
-
-
-    # os.remove('test_output.txt')
