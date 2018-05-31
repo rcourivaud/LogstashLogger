@@ -87,7 +87,9 @@ class MagicLogger(CustomLogger):
                         'function_res': function_res,
                         'class': kwargs.get('self')
                 }
+                
                 extra_decorate = {k:v for k, v in extra_decorate.items() if v}
+
                 self.log(level=level, msg=msg.format(**kwargs), extra_decorate=extra_decorate)
 
                 return res
