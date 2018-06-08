@@ -96,9 +96,12 @@ class MagicLogger(CustomLogger):
 
                 nonlocal msg
 
+                print("\n... here is extradecorato", extra_decorate, "\n")
+
                 msg = f'{extra_decorate["function_class"] if extra_decorate.get("function_class") else ""}' \
-                      f'{" > " if extra_decorate.get("function_class") else "" }' \
-                      f'{extra_decorate["function_name"] if extra_decorate.get("function_name") else ""} > ' \
+                      f'{" > " if extra_decorate.get("function_class") else ""}' \
+                      f'{extra_decorate["function_name"] if extra_decorate.get("function_name") else ""}' \
+                      f'{" > " if extra_decorate.get("function_name") else ""}' \
                       f'{msg}'
 
                 self.log(level=level, msg=msg.format(**kwargs), extra_decorate=extra_decorate)
