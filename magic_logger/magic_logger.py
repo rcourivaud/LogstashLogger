@@ -62,7 +62,7 @@ class MagicLogger(CustomLogger):
                 self.log(level=ERROR, msg="Connection to logstash unsuccessful. ({0}:{1})".format(host, port))
 
     def decorate(self, msg="Example message", logstash=False, level=DEBUG):
-
+        msg_decorate = msg
         def _(f):
             def wrapper(*args, **kwargs):
                 before = datetime.datetime.now()
@@ -98,7 +98,7 @@ class MagicLogger(CustomLogger):
 
                 msg = f'{extra_decorate["function_class"] + " > " if extra_decorate.get("function_class") else ""}' \
                       f'{extra_decorate["function_name"] + " > "  if extra_decorate.get("function_name") else ""}' \
-                      f'{msg}'
+                      f'{msg_decorate}'
 
                 self.log(level=level, msg=msg.format(**kwargs),
                          extra_decorate=extra_decorate, logstash=logstash)
