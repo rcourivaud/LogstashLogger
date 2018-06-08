@@ -7,6 +7,7 @@ import os
 
 import socket
 import inspect
+import datetime
 
 from magic_logger.custom_logger import CustomLogger
 
@@ -37,19 +38,17 @@ class MagicLogger(CustomLogger):
 
         self.blacklist = [] if blacklist is None else blacklist
 
+        formatter = Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
         if file_name is not None:
             file_handler = FileHandler(filename=file_name)
             file_handler.setLevel(DEBUG)
-            formatter = Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
             file_handler.setFormatter(formatter)
             self.addHandler(file_handler)
-
-        self.addHandler(TCPLogstashHandler(host, port, version=1))
 
         # console logging
         console_handler = StreamHandler()
         console_handler.setLevel(DEBUG)
-        formatter = Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         console_handler.setFormatter(formatter)
         self.addHandler(console_handler)
 
@@ -58,13 +57,14 @@ class MagicLogger(CustomLogger):
             try:
                 socket.socket().connect((host, port))
                 self.info("Connection to logstash successful.")
+                self.logstash_handler = TCPLogstashHandler(host, port, version=1)
             except (ConnectionRefusedError, socket.gaierror):
                 self.log(level=ERROR, msg="Connection to logstash unsuccessful. ({0}:{1})".format(host, port))
 
-    def decorate(self, msg="Example message", level=DEBUG):
+    def decorate(self, msg="Example message", logstash=False, level=DEBUG):
+
         def _(f):
             def wrapper(*args, **kwargs):
-                import datetime
                 before = datetime.datetime.now()
                 res = f(*args, **kwargs)
                 after = datetime.datetime.now()
@@ -96,13 +96,12 @@ class MagicLogger(CustomLogger):
 
                 nonlocal msg
 
-                msg = f'{extra_decorate["function_class"] if extra_decorate.get("function_class") else ""}' \
-                      f'{" > " if extra_decorate.get("function_class") else ""}' \
-                      f'{extra_decorate["function_name"] if extra_decorate.get("function_name") else ""}' \
-                      f'{" > " if extra_decorate.get("function_name") else ""}' \
+                msg = f'{extra_decorate["function_class"] + " > " if extra_decorate.get("function_class") else ""}' \
+                      f'{extra_decorate["function_name"] + " > "  if extra_decorate.get("function_name") else ""}' \
                       f'{msg}'
 
-                self.log(level=level, msg=msg.format(**kwargs), extra_decorate=extra_decorate)
+                self.log(level=level, msg=msg.format(**kwargs),
+                         extra_decorate=extra_decorate, logstash=logstash)
 
                 return res
             return wrapper
