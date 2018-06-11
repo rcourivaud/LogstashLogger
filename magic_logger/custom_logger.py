@@ -1,5 +1,6 @@
 import sys
-from logging import Logger, DEBUG, INFO, CRITICAL, ERROR, WARNING, _checkLevel, addLevelName
+from logging import Logger, DEBUG, INFO, CRITICAL, ERROR, WARNING, _checkLevel, addLevelName, lastResort, \
+    raiseExceptions
 
 import os
 
@@ -7,6 +8,9 @@ _srcfile = os.path.normcase(addLevelName.__code__.co_filename)
 
 class CustomLogger(Logger):
 
+    def __init__(self, name):
+        super().__init__(name)
+        self.logstash_handler = None
 
     def debug(self, msg, *args, **kwargs):
         """
@@ -90,17 +94,16 @@ class CustomLogger(Logger):
         logger.log(level, "We have a %s", "mysterious problem", exc_info=1)
         """
 
-        #extra_decorate = {**(extra_decorate if extra_decorate else {})}
-
         if self.isEnabledFor(_checkLevel(level)):
             self._log(_checkLevel(level), msg, args, **kwargs, extra_decorate=extra_decorate)
 
 
-    def _log(self, level, msg, args, exc_info=None, extra=None, extra_decorate=None, stack_info=False):
+    def _log(self, level, msg, args, exc_info=None, extra=None, extra_decorate=None, stack_info=False, logstash=False):
         """
         Low-level logging routine which creates a LogRecord and then calls
         all the handlers of this logger to handle the record.
         """
+
         level = _checkLevel(level.upper()) if isinstance(level, str) else level
 
         extra = {**(extra if extra else {}) , **(extra_decorate if extra_decorate else {}), **(self.extra if self.extra else {})}
@@ -123,6 +126,49 @@ class CustomLogger(Logger):
                 exc_info = sys.exc_info()
         record = self.makeRecord(self.name, level, fn, lno, msg, args,
                                  exc_info, func, extra, sinfo)
-        self.handle(record)
+
+        self.handle(record, handlers = [self.logstash_handler] if logstash is True and self.logstash_handler is not None else [])
         return record
+
+    def handle(self, record, handlers):
+        """
+        Call the handlers for the specified record.
+
+        This method is used for unpickled records received from a socket, as
+        well as those created locally. Logger-level filtering is applied.
+        """
+
+        if (not self.disabled) and self.filter(record):
+            self.callHandlers(record, handlers=handlers)
+
+    def callHandlers(self, record, handlers):
+        """
+        Pass a record to all relevant handlers.
+
+        Loop through all handlers for this logger and its parents in the
+        logger hierarchy. If no handler was found, output a one-off error
+        message to sys.stderr. Stop searching up the hierarchy whenever a
+        logger with the "propagate" attribute set to zero is found - that
+        will be the last logger whose handlers are called.
+        """
+
+        c = self
+        found = 0
+        while c:
+            for hdlr in c.handlers + handlers:
+                found = found + 1
+                if record.levelno >= hdlr.level:
+                    hdlr.handle(record)
+            if not c.propagate:
+                c = None    #break out
+            else:
+                c = c.parent
+        if (found == 0):
+            if lastResort:
+                if record.levelno >= lastResort.level:
+                    lastResort.handle(record)
+            elif raiseExceptions and not self.manager.emittedNoHandlerWarning:
+                sys.stderr.write("No handlers could be found for logger"
+                                 " \"%s\"\n" % self.name)
+                self.manager.emittedNoHandlerWarning = True
 
