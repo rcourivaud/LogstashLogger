@@ -61,7 +61,7 @@ class MagicLogger(CustomLogger):
             except (ConnectionRefusedError, socket.gaierror):
                 self.log(level=ERROR, msg="Connection to logstash unsuccessful. ({0}:{1})".format(host, port))
 
-    def decorate(self, msg="", logstash=False, level=DEBUG):
+    def decorate(self, msg=None, logstash=False, level=DEBUG):
         msg_decorate = msg
         def _(f):
             def wrapper(*args, **kwargs):
@@ -98,7 +98,7 @@ class MagicLogger(CustomLogger):
 
                 msg = f'{extra_decorate["function_class"] + " > " if extra_decorate.get("function_class") else ""}' \
                       f'{extra_decorate["function_name"] if extra_decorate.get("function_name") else ""}' \
-                      f'{" > " + msg_decorate if msg_decorate else ""}'
+                      f'{" > " + msg_decorate if msg_decorate is not None else ""}'
 
                 self.log(level=level, msg=msg.format(**kwargs),
                          extra_decorate=extra_decorate, logstash=logstash)
