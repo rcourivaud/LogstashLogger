@@ -40,49 +40,52 @@ class LogstashLogger(Logger):
 
         self.addHandler(TCPLogstashHandler(host, port, version=1))
 
-        #console logging
+        # console logging
         console_handler = StreamHandler()
         console_handler.setLevel(DEBUG)
         formatter = Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         console_handler.setFormatter(formatter)
         self.addHandler(console_handler)
 
-        #console logging checking for logstash connection success
+        # console logging checking for logstash connection success
         try:
             socket.socket().connect((host, port))
             self.info("Connection to logstash successful.")
         except (ConnectionRefusedError, socket.gaierror):
             self.log(level=ERROR, msg="Connection to logstash unsuccessful. ({0}:{1})".format(host, port))
 
-    def decorate(self, msg="Example message", level=DEBUG):
+    def decorate(self, msg="Example message", level=DEBUG, function_res=None, function_kwargs=None):
         def _(f):
-            def wrapper(*args,**kwargs):
+            def wrapper(*args, **kwargs):
                 import datetime
                 before = datetime.datetime.now()
-                res = f(*args,**kwargs)
+                res = f(*args, **kwargs)
                 after = datetime.datetime.now()
-                execution_time = (after-before).total_seconds()
+                execution_time = (after - before).total_seconds()
 
                 kwargs = {
-                        **kwargs,
-                        **{arg_name:arg_value for arg_name, arg_value in zip(inspect.getfullargspec(f).args, args)}
-                        }
+                    **kwargs,
+                    **{arg_name: arg_value for arg_name, arg_value in zip(inspect.getfullargspec(f).args, args)}
+                }
 
                 extra = {
-                        "function_name": f.__name__,
-                        "execution_time": execution_time,
-                        "function_class": kwargs.get("self").__class__.__name__ if kwargs.get("self") else None,
-                        **{
-                            'function_kwargs': {k:str(v) for k, v in kwargs.items() if k not in self.blacklist},
-                            'function_res': res,
-                            'class': kwargs.get('self')
-                        }
+                    "function_name": f.__name__,
+                    "execution_time": execution_time,
+                    "function_class": kwargs.get("self").__class__.__name__ if kwargs.get("self") else None,
+                    **{
+                        'function_kwargs': {k: str(v) for k, v in kwargs.items() if
+                                            k not in self.blacklist} if function_kwargs else None,
+                        'function_res': res if function_res else None,
+                        'class': kwargs.get('self')
+                    }
                 }
 
                 self.log(level=level, msg=msg.format(**kwargs), extra_=extra)
 
                 return res
+
             return wrapper
+
         return _
 
     def log(self, level, msg, extra_=None, *args, **kwargs):
@@ -105,7 +108,7 @@ class LogstashLogger(Logger):
         """
         level = _checkLevel(level.upper()) if isinstance(level, str) else level
 
-        extra = {**(extra if extra else {}) , **(extra_ if extra_ else {}), **(self.extra if self.extra else {})}
+        extra = {**(extra if extra else {}), **(extra_ if extra_ else {}), **(self.extra if self.extra else {})}
 
         sinfo = None
         if _srcfile:
