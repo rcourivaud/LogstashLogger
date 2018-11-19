@@ -3,6 +3,7 @@ import sys
 from logging import Logger, DEBUG, INFO, CRITICAL, ERROR, WARNING, raiseExceptions, FileHandler, StreamHandler, \
     Formatter, _checkLevel, addLevelName
 
+from datetime import datetime
 from logstash import TCPLogstashHandler
 
 import os
@@ -59,13 +60,13 @@ class LogstashLogger(Logger):
             except (ConnectionRefusedError, socket.gaierror):
                 self.log(level=ERROR, msg="Connection to logstash unsuccessful. ({0}:{1})".format(host, port))
 
-    def decorate(self, msg=None, logstash=False, level=DEBUG):
+    def decorate(self, msg=None, logstash=False, level=DEBUG, display_result=None, display_kwargs=None):
         msg_decorate = msg
         def _(f):
             def wrapper(*args, **kwargs):
-                before = datetime.datetime.now()
+                before = datetime.now()
                 res = f(*args, **kwargs)
-                after = datetime.datetime.now()
+                after = datetime.now()
                 execution_time = (after - before).total_seconds()
 
                 kwargs = {
@@ -85,8 +86,8 @@ class LogstashLogger(Logger):
                     'execution_time': execution_time,
                     'function_class': kwargs.get("self").__class__.__name__ if kwargs.get("self") else None,
                     'function_kwargs': {k: str(v) if not isinstance(v, list) else str(v) for k, v in kwargs.items() if
-                                        k not in self.blacklist},
-                    'function_res': function_res if function_res,
+                                        k not in self.blacklist} if display_kwargs else None,
+                    'function_res': function_res if display_result else None,
                     'class': kwargs.get('self')
                 }
 
